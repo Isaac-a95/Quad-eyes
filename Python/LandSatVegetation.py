@@ -35,8 +35,9 @@ CORNER_LR_LAT_PRODUCT = 27.80760
 CORNER_LR_LON_PRODUCT = -15.15737
 
 
+print "Opening B4..."
 # gdalwarp LC82070402017107LGN00_B5.TIF LC82070402017107LGN00_B5_longlat.TIF -t_srs "+proj=longlat +ellps=WGS84"
-ds = gdal.Open('/media/isaac/DATA1/landsat/downloads/LC82070402017107LGN00/LC82070402017107LGN00_B4_longlat.TIF')
+ds = gdal.Open('../LandsatData/LC82070402017107LGN00/LC82070402017107LGN00_B4_longlat.TIF')
 
 
 bandR = ds.GetRasterBand(1)
@@ -45,8 +46,8 @@ dataR = REFLECTANCE_MULT_BAND_4*dataR + REFLECTANCE_ADD_BAND_4
 
 ds = None
 
-
-ds = gdal.Open('/media/isaac/DATA1/landsat/downloads/LC82070402017107LGN00/LC82070402017107LGN00_B5_longlat.TIF')
+print "Opening B5..."
+ds = gdal.Open('../LandsatData/LC82070402017107LGN00/LC82070402017107LGN00_B5_longlat.TIF')
 bandNIR = ds.GetRasterBand(1)
 dataNIR = bandNIR.ReadAsArray()
 dataNIR = REFLECTANCE_MULT_BAND_5*dataNIR + REFLECTANCE_ADD_BAND_5
@@ -60,10 +61,11 @@ xoff, a, b, yoff, d, e = ds.GetGeoTransform()
 
 ds = None #Free memory
 
-
+print "Computing NDVI..."
 NDVI = (dataNIR-dataR)/(dataNIR+dataR)
 
-#plt.imsave('NDVI.png', NDVI, cmap = 'Greens', vmin=-1., vmax=1.)
+#print "Saving NDVI image..."
+#plt.imsave('NDVI.png', NDVI, cmap = 'Greens', vmin=0., vmax=1.)
 
 
 
@@ -77,15 +79,18 @@ def pixel2coord(x, y):
 mean = np.mean(data)*3.
 """
 
+print "Extracting mask..."
 mask = np.zeros(np.shape(NDVI))
 for i in range(len(NDVI)):
    for j in range(len(NDVI[0])):
-      if NDVI[i,j]>=.5:
+      if NDVI[i,j]>=.4:
         #pixel2coord(i,j)
         #data[i,j]
         mask[i,j] = 1
 
-#plt.imsave('mask0_5.png', mask, cmap='Greys')
+print mask
+#print "Saving mask image..."
+#plt.imsave('mask0_0.png', NDVI*mask, cmap='Greys')
 
 
 
@@ -109,8 +114,8 @@ def array2raster(rasterfn,newRasterfn,array):
     outRaster.SetProjection(outRasterSRS.ExportToWkt())
     outband.FlushCache()
  
-
-array2raster("/media/isaac/DATA1/landsat/downloads/LC82070402017107LGN00/LC82070402017107LGN00_B5_longlat.TIF", "NDVI_mask_0_5.TIF", mask)
+print "Saving GeoTIF masked NDVI..."
+array2raster("../LandsatData/LC82070402017107LGN00/LC82070402017107LGN00_B5_longlat.TIF", "NDVI_mask_0_4.TIF", mask)
 
 
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #ftp://ftp.nccs.nasa.gov/v2.0/fwiCalcs.GEOS-5/Default/TRMM/2017/
-f = netcdf.netcdf_file('20170130.nc', 'r')
+f = netcdf.netcdf_file('../RiskData/20170130.nc', 'r')
 
 risk = f.variables['TRMM_FWI']
 
@@ -24,7 +24,7 @@ meshLon, meshLat = np.meshgrid(lon[:], lat[:])
 
 
 
-ds = gdal.Open('NDVI_mask.TIF')
+ds = gdal.Open('NDVI_mask_0_4.TIF')
 bandNDVI = ds.GetRasterBand(1)
 NDVI = bandNDVI.ReadAsArray()
 xoff, a, b, yoff, d, e = ds.GetGeoTransform()
@@ -52,7 +52,7 @@ for i in range(len(NDVI)):
 
 
 print "Representando FWI"
-plt.pcolormesh(meshLon, meshLat, riskNow, vmin=0., vmax=1.)
+plt.pcolormesh(meshLon, meshLat, riskNow, vmin=0., vmax=10.)
 
 """
 print "Calculando coordenadas"
@@ -86,7 +86,7 @@ for i in range(len(NDVI)):
         latNDVI.append(coord[0])  
 
 
-plt.plot(latNDVI, lonNDVI, ".")
+plt.plot(latNDVI, lonNDVI, "g.", markersize=0.1)
 print "Guardando.."
 
 
